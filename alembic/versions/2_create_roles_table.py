@@ -1,8 +1,8 @@
-"""create_users_table
+"""create_roles_table
 
-Revision ID: 3df0a56bf7fa
-Revises: 
-Create Date: 2019-05-02 15:09:18.036043
+Revision ID: 23e1639bbbd6
+Revises: 1
+Create Date: 2019-05-02 15:26:25.396213
 
 """
 from alembic import op
@@ -10,20 +10,18 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "1"
-down_revision = None
+revision = "2"
+down_revision = "1"
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
     op.create_table(
-        "users",
+        "roles",
         sa.Column("id", sa.String, primary_key=True),
-        sa.Column("username", sa.String, unique=True, nullable=False),
-        sa.Column("pass_hash", sa.String, nullable=False),
-        sa.Column("email", sa.String, nullable=False),
-        sa.Column("role_id", sa.String, nullable=False),
+        sa.Column("role", sa.String, nullable=False),
+        sa.Column("permission", sa.String, nullable=False),
         sa.Column("enabled", sa.Boolean, nullable=False, server_default="true"),
         sa.Column(
             "created_at", sa.DateTime, nullable=False, server_default=sa.func.now()
@@ -35,8 +33,17 @@ def upgrade():
             server_default=sa.func.now(),
             server_onupdate=sa.func.now(),
         ),
+        sa.UniqueConstraint("role", "permission"),
+    )
+
+    op.create_foreign_key(
+        constraint_name="users_role_id_fkey",
+        source_table="users",
+        referent_table="roles",
+        local_cols=["role_id"],
+        remote_cols=["id"],
     )
 
 
 def downgrade():
-    op.drop_table("users")
+    op.drop_table("roles")
