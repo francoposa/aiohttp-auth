@@ -8,6 +8,7 @@ import socket
 
 from aiohttp import web
 
+from app.infrastructure.datastore.postgres.auth.utils import check_credentials
 
 ENV_INFO_KEYS = [
     "BUILD_DATE",
@@ -35,4 +36,8 @@ async def health_check(request):
 
 async def info(request):
     """Metadata."""
-    return web.json_response(INFO, dumps=_dumps)
+    if await check_credentials(
+        user_client=request.app.user_client, username="test", password="testy"
+    ):
+        return web.json_response(INFO, dumps=_dumps)
+    return web.HTTPUnauthorized(body=b"Invalid username/password combination")

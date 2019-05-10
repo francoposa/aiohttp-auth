@@ -4,9 +4,16 @@ import os
 from typing import Mapping
 
 from aiohttp import web
+from aiohttp_session import setup as setup_session
+from aiohttp_session.cookie_storage import EncryptedCookieStorage
+from aiohttp_security import setup as setup_security
+from aiohttp_security import SessionIdentityPolicy
 from aiopg.sa import create_engine
 
-from app.infrastructure.datastore.postgres import UserPostgresClient
+from app.infrastructure.datastore.postgres import UserPostgresClient, RolePostgresClient
+from app.infrastructure.datastore.postgres.auth.policy import (
+    PostgresAuthorizationPolicy,
+)
 from app.infrastructure.server import http
 from app.usecases import User
 
@@ -22,6 +29,18 @@ def on_startup(conf: Mapping):
         """
         pg_engine = await create_engine(**conf["postgres"])
         user_pg_client = UserPostgresClient(pg_engine)
+        role_pg_client = RolePostgresClient(pg_engine)
+
+        app.user_client = user_pg_client
+
+        setup_session(app, EncryptedCookieStorage(b"Thirty  two  length  bytes  key."))
+        setup_security(
+            app,
+            SessionIdentityPolicy(),
+            PostgresAuthorizationPolicy(
+                user_client=user_pg_client, role_client=role_pg_client
+            ),
+        )
 
     return startup_handler
 

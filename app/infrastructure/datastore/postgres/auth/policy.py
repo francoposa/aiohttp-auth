@@ -1,7 +1,6 @@
 from typing import Optional, List
 
 from aiohttp_security.abc import AbstractAuthorizationPolicy
-from passlib.hash import argon2
 
 from app.infrastructure.datastore.postgres import UserPostgresClient, RolePostgresClient
 from app.usecases import User, Role
@@ -25,7 +24,7 @@ class PostgresAuthorizationPolicy(AbstractAuthorizationPolicy):
         if identity is None:
             return False
         users: List[User] = await self.user_client.select_where(
-            inclusion_map={"username": identity}, exclusion_map={"enabled": False}
+            inclusion_map={"username": identity, "enabled": True}
         )
         if users:
             user: User = users[0]
