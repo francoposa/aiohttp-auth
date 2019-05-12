@@ -4,14 +4,29 @@ Setup functions for HTTP server.
 from typing import Awaitable
 
 import aiohttp_cors
+import jinja2
 from aiohttp import web
 
-from app.infrastructure.server.http.handlers import health
+from app.infrastructure.server.http.handlers import health, login
 
 RUNNING_TASKS = "running_tasks"
 
-HEALTH = "/health"
-INFO = "/info"
+HEALTH_PATH = "/api/v1/health"
+HEALTH_NAME = "health"
+
+INFO_PATH = "/api/v1/"
+INFO_NAME = "info"
+
+LOGIN_PATH = "/login"
+LOGIN_NAME = "login"
+
+
+def _setup_templates(app):
+    jinja_loader = jinja2.PackageLoader("app.infrastructure", "templates")
+    jinja_env = jinja2.Environment(
+        loader=jinja_loader, auto_reload=False, enable_async=True
+    )
+    app.jinja_env = jinja_env
 
 
 def _setup_routes(app):
@@ -27,16 +42,18 @@ def _setup_routes(app):
         },
     )
 
-    # Health check.
-    app.router.add_get(HEALTH, health.health_check)
+    # Health check & Metadata
+    app.router.add_get(HEALTH_PATH, health.health_check, name=HEALTH_NAME)
+    app.router.add_get(INFO_PATH, health.info, name=INFO_NAME)
 
-    # Metadata.
-    app.router.add_get(INFO, health.info)
+    app.router.add_get(LOGIN_PATH, login.login, name=LOGIN_NAME)
+    app.router.add_post(LOGIN_PATH, login.login, name=LOGIN_NAME)
 
 
 def configure_app(app: web.Application, startup_handler):
     """Configure the web.Application."""
 
+    _setup_templates(app)
     _setup_routes(app)
     # Schedule custom startup routine.
     app.on_startup.append(startup_handler)
