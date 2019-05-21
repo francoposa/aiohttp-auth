@@ -39,6 +39,16 @@ class BasePostgresClient:
             results: ResultProxy = await conn.execute(statement)
             return await results.fetchone()
 
+    async def select_first_where(
+        self, inclusion_map: Mapping = None, exclusion_map: Mapping = None
+    ):
+        results = await self.select_where(
+            inclusion_map=inclusion_map, exclusion_map=exclusion_map
+        )
+        if results:
+            return results[0]
+        return None
+
     async def select_where(
         self,
         inclusion_map: Mapping = None,

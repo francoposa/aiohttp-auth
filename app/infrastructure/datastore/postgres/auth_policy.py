@@ -14,24 +14,22 @@ class PostgresAuthorizationPolicy(AbstractAuthorizationPolicy):
         self.role_client = role_client
 
     async def authorized_userid(self, identity: str) -> Optional[str]:
-        users = await self.user_client.select_where(
+        user: User = await self.user_client.select_where(
             inclusion_map={"username": identity, "enabled": True}
         )
-        if users:
+        if user:
             return identity
 
     async def permits(self, identity, permission, context=None) -> bool:
         if identity is None:
             return False
-        users: List[User] = await self.user_client.select_where(
+        user: User = await self.user_client.select_first_where(
             inclusion_map={"username": identity, "enabled": True}
         )
-        if users:
-            user: User = users[0]
-            roles: List[Role] = await self.role_client.select_where(
+        if user:
+            role: Role = await self.role_client.select_first_where(
                 inclusion_map={"role_id": user.role_id}
             )
-            role: Role = roles[0]
             role_permissions: List[str] = role.permissions
             if permission in role_permissions:
                 return True

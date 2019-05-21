@@ -4,6 +4,7 @@ from aiohttp_security import authorized_userid, remember
 from app.infrastructure.app_constants import IDENTITY_POLICY, USER_CLIENT
 from app.infrastructure.server.http.routes import PORTAL_NAME
 from app.infrastructure.server.http.utils import redirect
+from app.usecases import User
 
 LOGIN_TEMPLATE = "login.html"
 
@@ -24,10 +25,9 @@ async def login(request):
         if not authorized:
             return web.Response(text="Sorry, nerd")
         else:
-            users = await user_client.select_where(
+            user: User = await user_client.select_first_where(
                 inclusion_map={"username": form["username"]}
             )
-            user = users[0]
             identity_policy = request.app[IDENTITY_POLICY]
             await identity_policy.remember(
                 request, response=None, identity=user.username
