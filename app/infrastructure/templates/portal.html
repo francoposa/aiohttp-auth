@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+
+    <div class="row text-center">
+        <h1>Welcome, {{ user.username }}</h1>
+        <h2>Let's get this money</h2>
+    </div>
+
+{% endblock %}

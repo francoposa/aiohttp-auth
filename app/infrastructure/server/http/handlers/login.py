@@ -1,7 +1,8 @@
 from aiohttp import web
 from aiohttp_security import authorized_userid, remember
+from aiohttp_security.api import IDENTITY_KEY
 
-from app.infrastructure.datastore.postgres.auth.utils import check_credentials
+
 from app.infrastructure.server.http.utils import redirect
 
 LOGIN_TEMPLATE = "login.html"
@@ -15,8 +16,8 @@ async def login(request):
     if request.method == "POST":
         form = await request.post()
 
-        authorized = await check_credentials(
-            request.app.user_client, form["username"], form["password"]
+        authorized = await request.app.user_client.check_credentials(
+            form["username"], form["password"]
         )
 
         if not authorized:
@@ -28,7 +29,8 @@ async def login(request):
                 inclusion_map={"username": form["username"]}
             )
             user = users[0]
-            await remember(request, response, user.username)
+            identity_policy = request.app[IDENTITY_KEY]
+            await identity_policy.remember(request, response, unstructure(user))
             return response
 
     template = request.app.jinja_env.get_template(LOGIN_TEMPLATE)

@@ -7,16 +7,19 @@ from marshmallow import Schema, ValidationError
 class BaseJSONUsecaseAdapter:
     """Class to marshal JSON into attrs classes using marshmallow"""
 
-    def __init__(self, usecase_cls, post_schema: Schema):
+    def __init__(self, usecase_cls, schema :Schema):
         self.UsecaseClass = usecase_cls  # attrs class
-        self.post_schema: Schema = post_schema
+        self.schema: Schema = schema
 
-    def to_usecase(self, mapping):
+    def dict_to_usecase(self, mapping):
         """Return a UsecaseClass() from an HTTP Request."""
 
         try:
-            usecase_data: Mapping = self.post_schema.load(mapping).data
+            usecase_data: Mapping = self.schema.load(mapping)
             return self.UsecaseClass(**usecase_data)
         except ValidationError as e:
             # TODO see what this error looks like, get useful info out, and re-raise as as a different error
-            pass
+            raise(e)
+
+    def usecase_to_dict(self, usecase):
+        return self.schema.dump(usecase)

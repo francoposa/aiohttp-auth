@@ -10,9 +10,9 @@ class BaseSchema(Schema):
     class Meta:
         """Meta data for BaseSchema."""
 
-        type_ = None
+        record_type = None
 
     @post_dump
     def tag_record_type(self, data):
         """Adds record type field post-dump."""
-        data["record_type"] = self.Meta.type_
+        data["record_type"] = self.Meta.record_type

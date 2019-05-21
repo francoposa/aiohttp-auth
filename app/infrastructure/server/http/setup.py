@@ -7,7 +7,7 @@ import aiohttp_cors
 import jinja2
 from aiohttp import web
 
-from app.infrastructure.server.http.handlers import health, login
+from app.infrastructure.server.http.handlers import health, login, portal
 
 RUNNING_TASKS = "running_tasks"
 
@@ -19,6 +19,9 @@ INFO_NAME = "info"
 
 LOGIN_PATH = "/login"
 LOGIN_NAME = "login"
+
+PORTAL_PATH = "/portal"
+PORTAL_NAME = "portal"
 
 
 def _setup_templates(app):
@@ -46,8 +49,12 @@ def _setup_routes(app):
     app.router.add_get(HEALTH_PATH, health.health_check, name=HEALTH_NAME)
     app.router.add_get(INFO_PATH, health.info, name=INFO_NAME)
 
+    # Login
     app.router.add_get(LOGIN_PATH, login.login, name=LOGIN_NAME)
     app.router.add_post(LOGIN_PATH, login.login, name=LOGIN_NAME)
+
+    # Portal
+    app.router.add_get(PORTAL_PATH, portal.portal, name=PORTAL_NAME)
 
 
 def configure_app(app: web.Application, startup_handler):
