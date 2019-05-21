@@ -1,8 +1,7 @@
 from aiohttp import web
 from aiohttp_security import authorized_userid, remember
-from aiohttp_security.api import IDENTITY_KEY
 
-
+from app.infrastructure.app_constants import IDENTITY_POLICY, USER_CLIENT
 from app.infrastructure.server.http.utils import redirect
 
 LOGIN_TEMPLATE = "login.html"
@@ -16,7 +15,8 @@ async def login(request):
     if request.method == "POST":
         form = await request.post()
 
-        authorized = await request.app.user_client.check_credentials(
+        user_client = request.app[USER_CLIENT]
+        authorized = await user_client.check_credentials(
             form["username"], form["password"]
         )
 
@@ -24,13 +24,12 @@ async def login(request):
             return web.Response(text="Sorry, nerd")
         else:
             response = web.Response(text="Welcome, let's get this money")
-
-            users = await request.app.user_client.select_where(
+            users = await user_client.select_where(
                 inclusion_map={"username": form["username"]}
             )
             user = users[0]
-            identity_policy = request.app[IDENTITY_KEY]
-            await identity_policy.remember(request, response, unstructure(user))
+            identity_policy = request.app[IDENTITY_POLICY]
+            await identity_policy.remember(request, response, user.username)
             return response
 
     template = request.app.jinja_env.get_template(LOGIN_TEMPLATE)

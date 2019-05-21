@@ -35,10 +35,13 @@ def on_startup(conf: Mapping):
         # Register database clients
         app[app_constants.USER_CLIENT] = user_pg_client
 
-
         # Registers session middleware
-        setup_session(app, EncryptedCookieStorage(b"Thirty  two  length  bytes  key."))
-
+        setup_session(
+            app,
+            EncryptedCookieStorage(
+                secret_key=b"Thirty  two  length  bytes  key.", max_age=60 * 5
+            ),
+        )
 
         # Instatiate and Register aiohttp_security policies
         setup_security(
