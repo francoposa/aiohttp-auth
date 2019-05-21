@@ -40,6 +40,7 @@ class BasePostgresClient:
             return await results.fetchone()
 
     async def select_first_where(
+        #This is super lazy, I should reform the query and use .limit(1)
         self, inclusion_map: Mapping = None, exclusion_map: Mapping = None
     ):
         results = await self.select_where(
