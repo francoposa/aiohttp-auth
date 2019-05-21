@@ -8,20 +8,18 @@ import jinja2
 from aiohttp import web
 
 from app.infrastructure.server.http.handlers import health, login, portal
+from app.infrastructure.server.http.routes import (
+    HEALTH_NAME,
+    HEALTH_PATH,
+    INFO_NAME,
+    INFO_PATH,
+    LOGIN_NAME,
+    LOGIN_PATH,
+    PORTAL_NAME,
+    PORTAL_PATH,
+)
 
 RUNNING_TASKS = "running_tasks"
-
-HEALTH_PATH = "/api/v1/health"
-HEALTH_NAME = "health"
-
-INFO_PATH = "/api/v1/"
-INFO_NAME = "info"
-
-LOGIN_PATH = "/login"
-LOGIN_NAME = "login"
-
-PORTAL_PATH = "/portal"
-PORTAL_NAME = "portal"
 
 
 def _setup_templates(app):
