@@ -23,7 +23,7 @@ RUNNING_TASKS = "running_tasks"
 
 
 def _setup_templates(app):
-    jinja_loader = jinja2.PackageLoader("app.infrastructure", "templates")
+    jinja_loader = jinja2.PackageLoader("app.infrastructure.server", "templates")
     jinja_env = jinja2.Environment(
         loader=jinja_loader, auto_reload=False, enable_async=True
     )
