@@ -11,7 +11,7 @@ class UserPostgresClient(BasePostgresClient):
 
     async def check_credentials(self, username, password) -> bool:
         user: User = await self.select_first_where(
-            inclusion_map={"username": username, "enabled": True}
+            include={"username": username, "enabled": True}
         )
         if user:
             return argon2.verify(password, user.pass_hash)

@@ -40,24 +40,20 @@ class BasePostgresClient:
             return await results.fetchone()
 
     async def select_first_where(
-        #This is super lazy, I should reform the query and use .limit(1)
-        self, inclusion_map: Mapping = None, exclusion_map: Mapping = None
+        # This is super lazy, I should reform the query and use .limit(1)
+        self,
+        include: Mapping = None,
+        exclude: Mapping = None,
     ):
-        results = await self.select_where(
-            inclusion_map=inclusion_map, exclusion_map=exclusion_map
-        )
+        results = await self.select_where(include=include, exclude=exclude)
         if results:
             return results[0]
         return None
 
     async def select_where(
-        self,
-        inclusion_map: Mapping = None,
-        exclusion_map: Mapping = None,
-        page=0,
-        page_size=None,
+        self, include: Mapping = None, exclude: Mapping = None, page=0, page_size=None
     ):
-        where_clause = self._generate_where_clause(inclusion_map, exclusion_map)
+        where_clause = self._generate_where_clause(include, exclude)
         page_size = page_size if page_size else DEFAULT_PAGE_SIZE
         async with self.engine.acquire() as conn:
             statement: Select = self.table.select().where(where_clause)
@@ -66,23 +62,18 @@ class BasePostgresClient:
             return [await self._deserialize_from_db(result) async for result in results]
 
     async def update_where(
-        self,
-        values_map: Mapping,
-        inclusion_map: Mapping = None,
-        exclusion_map: Mapping = None,
+        self, set_values: Mapping, include: Mapping = None, exclude: Mapping = None
     ):
-        where_clause = self._generate_where_clause(inclusion_map, exclusion_map)
+        where_clause = self._generate_where_clause(include, exclude)
         async with self.engine.acquire() as conn:
             statement = self.table.update.where(where_clause)
 
-    def _generate_where_clause(
-        self, inclusion_map: Mapping = None, exclusion_map: Mapping = None
-    ):
+    def _generate_where_clause(self, include: Mapping = None, exclude: Mapping = None):
         """Turn inclusion/exclusion maps into SQLAlchemy `where` clause"""
         inclusion_ands = []
         exclusion_ands = []
-        if inclusion_map:
-            for field, includes in inclusion_map.items():
+        if include:
+            for field, includes in include.items():
                 table_col: Column = getattr(self.table.c, field)
                 if _isiterable(includes):
                     # Use SQL [column] IN [(values)]
@@ -90,8 +81,8 @@ class BasePostgresClient:
                 else:
                     # Use SQL [column] = [value]
                     inclusion_ands.append(table_col == includes)
-        if exclusion_map:
-            for field, excludes in exclusion_map.items():
+        if exclude:
+            for field, excludes in exclude.items():
                 table_col: Column = getattr(self.table.c, field)
                 if _isiterable(excludes):
                     # Use SQL [column] NOT IN [(values)]
@@ -101,7 +92,7 @@ class BasePostgresClient:
                     exclusion_ands.append(table_col != excludes)
         return and_(*inclusion_ands, *exclusion_ands)
 
-    def _generate_values_clause(self, values_map: Mapping):
+    def _generate_values_clause(self, set_values: Mapping):
         pass
 
     def _paginate_query(self, where_clause, page=0, page_size=None):

@@ -1,6 +1,5 @@
 from aiohttp import web
-from aiohttp_security import authorized_userid, remember, AbstractIdentityPolicy
-from aiohttp_security.api import IDENTITY_KEY
+from aiohttp_security import AbstractIdentityPolicy
 
 from app.infrastructure.app_constants import IDENTITY_POLICY, USER_CLIENT
 from app.infrastructure.server.http.routes import LOGIN_NAME
@@ -14,9 +13,7 @@ async def portal(request):
     username: str = await identity_policy.identify(request)
     if username:
         user_client = request.app[USER_CLIENT]
-        user = await user_client.select_first_where(
-            inclusion_map={"username": username}
-        )
+        user = await user_client.select_first_where(include={"username": username})
         template = request.app.jinja_env.get_template(PORTAL_TEMPLATE)
         return web.Response(
             text=await template.render_async({"user": user}), content_type="text/html"

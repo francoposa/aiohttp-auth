@@ -26,7 +26,7 @@ async def login(request):
             return web.Response(text="Sorry, nerd")
         else:
             user: User = await user_client.select_first_where(
-                inclusion_map={"username": form["username"]}
+                include={"username": form["username"]}
             )
             identity_policy = request.app[IDENTITY_POLICY]
             await identity_policy.remember(

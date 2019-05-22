@@ -9,10 +9,10 @@ async def test_where(db, user_pg_client):
 
     # Filters
     result_include = await user_pg_client.select_where(
-        inclusion_map={"username": ["brian", "roman"]}
+        include={"username": ["brian", "roman"]}
     )
     result_exclude = await user_pg_client.select_where(
-        exclusion_map={"username": ["brian", "roman"]}
+        exclude={"username": ["brian", "roman"]}
     )
     assert len(result_include) + len(result_exclude) == stub_count
 
