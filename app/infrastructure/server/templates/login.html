@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-
     <div class="row text-center">
         <h1>Sign In</h1>
+        <div id="login-error">
+        {% if error%}
+            Error: {{ error }}
+        {% endif %}
+        </div>
         <form action="/login" method="post">
             <p>
                 <label for="username">Username</label><br>

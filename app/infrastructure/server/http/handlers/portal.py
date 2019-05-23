@@ -2,10 +2,8 @@ from aiohttp import web
 from aiohttp_security import AbstractIdentityPolicy
 
 from app.infrastructure.app_constants import IDENTITY_POLICY, USER_CLIENT
-from app.infrastructure.server.http.routes import LOGIN_NAME
+from app.infrastructure.server.http.routes import LOGIN_NAME, PORTAL_TEMPLATE
 from app.infrastructure.server.http.utils import redirect
-
-PORTAL_TEMPLATE = "portal.html"
 
 
 async def portal(request):

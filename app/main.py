@@ -43,7 +43,7 @@ def on_startup(conf: Mapping):
             ),
         )
 
-        # Instatiate and Register aiohttp_security policies
+        # Instantiate and Register aiohttp_security policies
         setup_security(
             app,
             SessionIdentityPolicy(),

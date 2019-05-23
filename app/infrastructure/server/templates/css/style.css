@@ -1,0 +1,8 @@
+body {
+    font-family: 'Courier', sans-serif;
+    color: #191414;
+}
+
+#login-error {
+    min-height: 1.5em;
+}
