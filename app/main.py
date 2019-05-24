@@ -25,14 +25,6 @@ def on_startup(conf: Mapping):
         """
         setup_templates(app)
         setup_routes(app)
-
-        # Instantiate database clients
-        pg_engine = await create_engine(**conf["postgres"])
-        user_pg_client = UserPostgresClient(pg_engine)
-        role_pg_client = RolePostgresClient(pg_engine)
-        # Register database clients
-        app[USER_CLIENT] = user_pg_client
-
         # Registers session middleware
         setup_session(
             app,
@@ -40,6 +32,13 @@ def on_startup(conf: Mapping):
                 secret_key=b"Thirty  two  length  bytes  key.", max_age=60 * 5
             ),
         )
+
+        # Instantiate database clients
+        pg_engine = await create_engine(**conf["postgres"])
+        user_pg_client = UserPostgresClient(pg_engine)
+        role_pg_client = RolePostgresClient(pg_engine)
+        # Register database clients
+        app[USER_CLIENT] = user_pg_client
 
     return startup_handler
 
