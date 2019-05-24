@@ -1,6 +1,5 @@
-from aiohttp_security.api import AUTZ_KEY, IDENTITY_KEY
-
-AUTH_POLICY = AUTZ_KEY
-IDENTITY_POLICY = IDENTITY_KEY
+SESSION_ID_KEY = "aiohttp_session_id"
 
 USER_CLIENT = "user_client"
+
+TEMPLATE_ENGINE = "template_engine"

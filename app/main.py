@@ -6,16 +6,12 @@ from typing import Mapping
 from aiohttp import web
 from aiohttp_session import setup as setup_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
-from aiohttp_security import setup as setup_security
-from aiohttp_security import SessionIdentityPolicy
 from aiopg.sa import create_engine
 
+from app.infrastructure.app_constants import USER_CLIENT
 from app.infrastructure.datastore.postgres import UserPostgresClient, RolePostgresClient
-from app.infrastructure.datastore.postgres.auth_policy import (
-    PostgresAuthorizationPolicy,
-)
-from app.infrastructure import app_constants
-from app.infrastructure.server import http
+
+from app.infrastructure.server import setup_templates, setup_routes
 
 
 def on_startup(conf: Mapping):
@@ -27,28 +23,21 @@ def on_startup(conf: Mapping):
         These are tasks that should be run after the event loop has been started but before the HTTP
         server has been started.
         """
+        setup_templates(app)
+        setup_routes(app)
 
         # Instantiate database clients
         pg_engine = await create_engine(**conf["postgres"])
         user_pg_client = UserPostgresClient(pg_engine)
         role_pg_client = RolePostgresClient(pg_engine)
         # Register database clients
-        app[app_constants.USER_CLIENT] = user_pg_client
+        app[USER_CLIENT] = user_pg_client
 
         # Registers session middleware
         setup_session(
             app,
             EncryptedCookieStorage(
                 secret_key=b"Thirty  two  length  bytes  key.", max_age=60 * 5
-            ),
-        )
-
-        # Instantiate and Register aiohttp_security policies
-        setup_security(
-            app,
-            SessionIdentityPolicy(),
-            PostgresAuthorizationPolicy(
-                user_client=user_pg_client, role_client=role_pg_client
             ),
         )
 
@@ -65,6 +54,6 @@ def main():
         conf = json.load(conf_file)
 
     app = web.Application()
-    http.configure_app(app, on_startup(conf))
+    app.on_startup.append(on_startup(conf))
     port = int(os.environ.get("PORT", 8080))
     web.run_app(app, host="0.0.0.0", port=port)
