@@ -7,7 +7,7 @@ import jinja2
 from aiohttp import web
 
 from app.infrastructure.app_constants import TEMPLATE_ENGINE
-from app.infrastructure.server.handlers import portal
+from app.infrastructure.server.handlers import portal, logout
 from app.infrastructure.server.handlers import login, health
 from app.infrastructure.server.routes import (
     HEALTH_NAME,
@@ -16,6 +16,8 @@ from app.infrastructure.server.routes import (
     LOGIN_PATH,
     PORTAL_NAME,
     PORTAL_PATH,
+    LOGOUT_PATH,
+    LOGOUT_NAME,
 )
 
 
@@ -49,3 +51,6 @@ def setup_routes(app):
 
     # Portal
     app.router.add_get(PORTAL_PATH, portal.portal, name=PORTAL_NAME)
+
+    # Logout
+    app.router.add_get(LOGOUT_PATH, logout.logout, name=LOGOUT_NAME)

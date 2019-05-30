@@ -8,6 +8,9 @@ LOGIN_PATH = "/login"
 LOGIN_NAME = "login"
 LOGIN_TEMPLATE = "login.html"
 
+LOGOUT_PATH = "/logout"
+LOGOUT_NAME = "logout"
+
 PORTAL_PATH = "/portal"
 PORTAL_NAME = "portal"
 PORTAL_TEMPLATE = "portal.html"
