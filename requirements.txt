@@ -24,6 +24,7 @@ psycopg2-binary==2.8.2
 py==1.8.0
 pycparser==2.19
 pytest==4.4.2
+pytest-aiohttp==0.3.0
 python-dateutil==2.8.0
 python-editor==1.0.4
 six==1.12.0

@@ -4,7 +4,6 @@ Setup functions for HTTP server.
 
 import aiohttp_cors
 import jinja2
-from aiohttp import web
 
 from app.infrastructure.app_constants import TEMPLATE_ENGINE
 from app.infrastructure.server.handlers import portal, logout

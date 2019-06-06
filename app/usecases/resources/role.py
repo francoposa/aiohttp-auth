@@ -10,8 +10,7 @@ from app.usecases.resources.utils import generate_uuid
 class Role:
 
     role = attr.ib(validator=instance_of(str))
-    pass_hash = attr.ib(validator=instance_of(str))
-    permissions = attr.ib(validator=instance_of(str))
+    permissions = attr.ib(validator=instance_of(list))
 
     # Auto-generated on creation of usecase object
     id = attr.ib(validator=instance_of(str), default=attr.Factory(generate_uuid))
