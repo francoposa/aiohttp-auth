@@ -1,5 +1,4 @@
 import datetime
-from collections.abc import Iterable
 from typing import Dict, Iterable, Mapping
 
 import attr
@@ -9,7 +8,7 @@ from aiopg.sa.result import ResultProxy, RowProxy
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import Insert
 from sqlalchemy.sql.selectable import Select
-from sqlalchemy.sql import select, and_, not_
+from sqlalchemy.sql import and_, not_
 from sqlalchemy.sql.schema import Column
 
 DEFAULT_PAGE_SIZE = 100
@@ -40,30 +39,20 @@ class BasePostgresClient:
             return await results.fetchone()
 
     async def select_first_where(
-        # This is super lazy, I should reform the query and use .limit(1)
-        self,
-        include: Mapping = None,
-        exclude: Mapping = None,
+        self, include: Mapping = None, exclude: Mapping = None
     ):
-        results = await self.select_where(include=include, exclude=exclude)
+        results = await self.select_where(include=include, exclude=exclude, page_size=1)
         if results:
             return results[0]
         return None
 
     async def select_where(
-        self,
-        include: Mapping = None,
-        exclude: Mapping = None,
-        limit=0,
-        page=0,
-        page_size=None,
+        self, include: Mapping = None, exclude: Mapping = None, page=0, page_size=None
     ):
         where_clause = self._generate_where_clause(include, exclude)
         page_size = page_size if page_size else DEFAULT_PAGE_SIZE
         async with self.engine.acquire() as conn:
             statement: Select = self.table.select().where(where_clause)
-            if limit:
-                statement = statement.limit(limit)
             paginated_statement = self._paginate_query(statement, page, page_size)
             results: ResultProxy = await conn.execute(paginated_statement)
             return [await self._deserialize_from_db(result) async for result in results]
