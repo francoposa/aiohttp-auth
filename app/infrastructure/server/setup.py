@@ -42,11 +42,11 @@ def setup_routes(app):
     )
 
     # Health check
-    app.router.add_get(HEALTH_PATH, health.health_check, name=HEALTH_NAME)
+    cors.add(app.router.add_get(HEALTH_PATH, health.health_check, name=HEALTH_NAME))
 
     # Login
-    app.router.add_get(LOGIN_PATH, login.login, name=LOGIN_NAME)
-    app.router.add_post(LOGIN_PATH, login.login, name=LOGIN_NAME)
+    cors.add(app.router.add_get(LOGIN_PATH, login.login, name=LOGIN_NAME))
+    cors.add(app.router.add_post(LOGIN_PATH, login.login_post, name=LOGIN_NAME))
 
     # Portal
     app.router.add_get(PORTAL_PATH, portal.portal, name=PORTAL_NAME)
