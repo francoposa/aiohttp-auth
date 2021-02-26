@@ -1,4 +1,4 @@
-aiohttp==3.5.4
+aiohttp==3.7.4
 aiohttp-cors==0.7.0
 aiohttp-session==2.7.0
 aiopg==0.16.0
